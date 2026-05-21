@@ -250,41 +250,6 @@
       return { status: 'ok', buffer: copy };
     }
 
-    // ── Inline tests (remove after verifying) ───────────────
-    (function runTests() {
-      function makeBuffer(size, byteAt) {
-        const buf  = new ArrayBuffer(size);
-        const view = new DataView(buf);
-        if (byteAt !== undefined) view.setUint8(PATCH_OFFSET, byteAt);
-        return buf;
-      }
-
-      // too_small
-      const r1 = patchBuffer(new ArrayBuffer(100));
-      console.assert(r1.status === 'too_small', 'FAIL too_small');
-
-      // already_patched
-      const r2 = patchBuffer(makeBuffer(MIN_SIZE, BYTE_AFTER));
-      console.assert(r2.status === 'already_patched', 'FAIL already_patched');
-
-      // wrong_byte
-      const r3 = patchBuffer(makeBuffer(MIN_SIZE, 0xAA));
-      console.assert(r3.status === 'wrong_byte', 'FAIL wrong_byte status');
-      console.assert(r3.byte  === 0xAA,          'FAIL wrong_byte value');
-
-      // ok — patch applied
-      const r4 = patchBuffer(makeBuffer(MIN_SIZE, BYTE_BEFORE));
-      console.assert(r4.status === 'ok', 'FAIL ok status');
-      console.assert(new DataView(r4.buffer).getUint8(PATCH_OFFSET) === BYTE_AFTER, 'FAIL ok byte');
-
-      // ok — original buffer NOT mutated
-      const orig = makeBuffer(MIN_SIZE, BYTE_BEFORE);
-      patchBuffer(orig);
-      console.assert(new DataView(orig).getUint8(PATCH_OFFSET) === BYTE_BEFORE, 'FAIL immutability');
-
-      console.log('%c✅ patchBuffer: tous les tests OK', 'color: #4caf50; font-weight: bold');
-    })();
-
     // ── DOM refs ────────────────────────────────────────────
     const dropZone  = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -355,9 +320,7 @@
             const a    = document.createElement('a');
             a.href     = url;
             a.download = 'PNDNavigator';
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
             showStatus('success',
               "✅ Fichier patché ! Copiez PNDNavigator à la racine de votre carte SD en remplaçant l'original, puis remettez la carte dans votre voiture.");
