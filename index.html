@@ -284,6 +284,96 @@
 
       console.log('%c✅ patchBuffer: tous les tests OK', 'color: #4caf50; font-weight: bold');
     })();
+
+    // ── DOM refs ────────────────────────────────────────────
+    const dropZone  = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameEl= document.getElementById('fileName');
+    const patchBtn  = document.getElementById('patchBtn');
+    const statusEl  = document.getElementById('status');
+
+    let selectedFile = null;
+
+    // ── File selection ───────────────────────────────────────
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+    });
+    fileInput.addEventListener('change', () => setFile(fileInput.files[0]));
+
+    // Drag-and-drop
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      setFile(e.dataTransfer.files[0]);
+    });
+
+    function setFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      fileNameEl.textContent = '📄 ' + file.name;
+      fileNameEl.classList.add('loaded');
+      patchBtn.disabled = false;
+      hideStatus();
+    }
+
+    // ── Patch button ─────────────────────────────────────────
+    patchBtn.addEventListener('click', () => {
+      if (!selectedFile) return;
+      patchBtn.disabled = true;
+      patchBtn.textContent = '⏳ Traitement…';
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const result = patchBuffer(e.target.result);
+
+          if (result.status === 'too_small') {
+            showStatus('error',
+              `❌ Fichier trop petit (${e.target.result.byteLength} octets) — vérifiez que c'est bien PNDNavigator.`);
+
+          } else if (result.status === 'already_patched') {
+            showStatus('warning', '⚠️ Ce fichier est déjà patché — rien à faire.');
+
+          } else if (result.status === 'wrong_byte') {
+            const hex = result.byte.toString(16).toUpperCase().padStart(2, '0');
+            showStatus('error',
+              `❌ Octet inattendu à l'offset 0x${PATCH_OFFSET.toString(16).toUpperCase()} : 0x${hex}. Mauvais fichier ou mauvaise version.`);
+
+          } else if (result.status === 'ok') {
+            const blob = new Blob([result.buffer], { type: 'application/octet-stream' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = 'PNDNavigator';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus('success',
+              "✅ Fichier patché ! Copiez PNDNavigator à la racine de votre carte SD en remplaçant l'original, puis remettez la carte dans votre voiture.");
+          }
+        } catch (err) {
+          showStatus('error', `❌ Erreur inattendue : ${err.message}`);
+        } finally {
+          patchBtn.disabled = false;
+          patchBtn.textContent = '🔧 Patcher et télécharger';
+        }
+      };
+      reader.readAsArrayBuffer(selectedFile);
+    });
+
+    // ── Helpers ──────────────────────────────────────────────
+    function showStatus(type, msg) {
+      statusEl.className = 'status ' + type;
+      statusEl.textContent = msg;
+      statusEl.style.display = 'block';
+    }
+    function hideStatus() {
+      statusEl.style.display = 'none';
+    }
   </script>
 </body>
 </html>
