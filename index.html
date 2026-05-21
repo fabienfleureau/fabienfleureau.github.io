@@ -150,6 +150,74 @@
   </style>
 </head>
 <body>
-  <p>À venir…</p>
+  <div class="container">
+
+    <header>
+      <h1>⏰ Réparer l'heure Carminat TomTom</h1>
+      <p>Clio II · Mégane II · Laguna II — Patch PNDNavigator</p>
+    </header>
+
+    <!-- ── Cas 1 ─────────────────────────────── -->
+    <div class="card">
+      <div class="card-title">📁 Cas 1 — J'ai le fichier PNDNavigator</div>
+
+      <div class="drop-zone" id="dropZone" role="button" tabindex="0"
+           aria-label="Zone de dépôt : glissez PNDNavigator ici ou cliquez pour choisir">
+        <div class="icon">📂</div>
+        <div>Glissez-déposez <strong>PNDNavigator</strong> ici</div>
+        <div style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7">ou cliquez pour choisir</div>
+        <input type="file" id="fileInput" style="display:none" aria-hidden="true">
+      </div>
+
+      <div class="file-name" id="fileName">Aucun fichier sélectionné</div>
+
+      <button id="patchBtn" disabled>🔧 Patcher et télécharger</button>
+
+      <div class="status" id="status" role="alert" aria-live="polite"></div>
+    </div>
+
+    <div class="divider">— ou —</div>
+
+    <!-- ── Cas 2 ─────────────────────────────── -->
+    <div class="card">
+      <div class="card-title">📥 Cas 2 — Je n'ai pas le fichier PNDNavigator</div>
+      <ol class="steps">
+        <li>
+          <p>
+            Téléchargez le fichier navcore :<br>
+            <a href="https://download.tomtom.com/sweet/navcore/navcore_8843.3130258.Carminat_TomTom.cab"
+               target="_blank" rel="noopener noreferrer">
+              navcore_8843.3130258.Carminat_TomTom.cab
+            </a>
+          </p>
+        </li>
+        <li>
+          <p>Dézippez le fichier <code>.cab</code> (WinRAR, 7-Zip, ou l'explorateur Windows).</p>
+        </li>
+        <li>
+          <p>Copiez <strong>TOUS</strong> les fichiers directement à la <strong>racine</strong> de la carte SD.</p>
+          <div class="warn-box">
+            ⚠️ Ne mettez <strong>pas</strong> les fichiers dans le sous-dossier
+            <code>IA0000700006swlimage0</code> — copiez-les directement à la racine.
+          </div>
+        </li>
+        <li>
+          <p>Si Windows demande de remplacer des fichiers existants → cliquez <strong>Ignorer</strong>.</p>
+        </li>
+        <li>
+          <p>Renommez <code>~tsystem</code> en <code>ttsystem</code> (retirez le <code>~</code>).</p>
+        </li>
+        <li>
+          <p>Vous avez maintenant <code>PNDNavigator</code> sur la carte SD. Utilisez l'outil <strong>Cas 1</strong> ci-dessus pour le patcher.</p>
+        </li>
+      </ol>
+    </div>
+
+    <footer>
+      🔒 Traitement 100&nbsp;% local — votre fichier ne quitte jamais votre ordinateur.
+    </footer>
+
+  </div>
+  <!-- JS goes here in Task 4 -->
 </body>
 </html>
