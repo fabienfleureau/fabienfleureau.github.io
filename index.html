@@ -303,7 +303,9 @@
 
     // Drag-and-drop
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('dragleave', e => {
+      if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-over');
+    });
     dropZone.addEventListener('drop', e => {
       e.preventDefault();
       dropZone.classList.remove('drag-over');
@@ -326,6 +328,11 @@
       patchBtn.textContent = '⏳ Traitement…';
 
       const reader = new FileReader();
+      reader.onerror = () => {
+        showStatus('error', '❌ Impossible de lire le fichier.');
+        patchBtn.disabled = false;
+        patchBtn.textContent = '🔧 Patcher et télécharger';
+      };
       reader.onload = e => {
         try {
           const result = patchBuffer(e.target.result);
